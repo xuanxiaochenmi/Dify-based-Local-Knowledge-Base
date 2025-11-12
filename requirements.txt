@@ -1,0 +1,14 @@
+# Local Knowledge Base 项目依赖库列表
+
+# YAML配置文件解析库
+pyyaml>=6.0
+
+# MySQL数据库连接库
+mysql-connector-python>=8.0.0
+
+# HTTP请求库（用于Dify API调用）
+requests>=2.28.0
+
+# 可选：日志增强库（如需要更高级的日志功能）
+# python-dotenv>=0.20.0
+# logging-handlers>=0.1.0

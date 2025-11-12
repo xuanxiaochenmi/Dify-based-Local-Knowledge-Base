@@ -1,0 +1,30 @@
+scan_config:
+  scan_paths:
+    - "/data/software/nextcloud/data/data/__groupfolders/1/files"
+    # - "/data/software/nextcloud/data/data/__groupfolders/1/files/05_学生培养"
+  blacklist: # 黑名单，不扫描的文件夹
+    - "/data/software/nextcloud/data/data/__groupfolders/1/files/02_联创项目/华为_AI数据湖/03_里程碑记录/20251111/智能体展示数据/DataAgent用到的数据"
+    - "/data/software/nextcloud/data/data/__groupfolders/1/files/06_归档项目"
+  scan_interval: 1  # 扫描间隔，单位：小时
+  file_types: [".txt", ".markdown", ".mdx", ".pdf", ".html", ".htm", ".xlsx", ".xls", ".docx", ".csv", ".vtt", ".properties", ".md"] # 支持的文件类型
+  full_scan_cycle: 24  # 全量扫描周期，单位：小时
+
+dify_config:
+  api_key: "dataset-BwaP1ojh4MguKoso7tRuTTmg"  # 加密后的Dify北桥接口密钥
+  base_url: "http://10.33.102.10/v1"  # Dify接口基础URL
+  knowledge_base_mapping:  # 文件夹与知识库映射
+    "/data/software/nextcloud/data/data/__groupfolders/1/files": "b3213dcf-d968-4506-9c80-ec7a3a75d57b" 
+    "/data/software/nextcloud/data/data/__groupfolders/1/files/05_学生培养": "b3213dcf-d968-4506-9c80-ec7a3a75d57b" #测试用
+    #"E:/data/reports": "kb-789012"
+
+mysql_config:
+  host: "localhost"  # MySQL服务器地址
+  port: 3306  # MySQL端口号
+  username: "root"  # MySQL用户名
+  password: "123456"  # 加密后的MySQL密码
+  database: "knowledge_update_db"  # 数据库名
+  charset: "utf8mb4"  # 字符集
+
+log_config:
+  log_dir: "/home/root01/AI_konwledge_base/logs"  # 日志存储目录
+  log_level: "INFO"  # 日志级别：DEBUG, INFO, WARNING, ERROR
