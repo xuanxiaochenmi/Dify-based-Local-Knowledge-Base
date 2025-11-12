@@ -7,55 +7,68 @@ import hashlib  # 导入hashlib模块用于计算SHA256哈希值
 import logging
 from logging.handlers import RotatingFileHandler
 
+# 导入配置管理模块，替换硬编码的配置加载
+from config_manager import global_config
 
-# 加载yaml配置
-with open("/home/root01/AI_knowledge_base/config.yaml", "r", encoding="utf-8") as f:
-    config = yaml.safe_load(f)
-    # 提取扫描配置
-    scan_config = config["scan_config"]
-    scan_paths = scan_config["scan_paths"]
-    scan_interval = scan_config["scan_interval"]
-    file_types = scan_config["file_types"]
-    full_scan_cycle = scan_config["full_scan_cycle"]
-    # 新增：获取blacklist配置
-    blacklist = scan_config.get("blacklist", [])
+# 设置日志系统
+def setup_logging():
+    # 获取全局配置
+    config = global_config.get_config()
     
-    # 提取日志配置
-    log_config = config["log_config"]
-    log_dir = log_config["log_dir"]
-    log_level = log_config["log_level"]
-
-# 修正日志目录路径（如果存在拼写错误）
-if log_dir == "/home/root01/AI_konwledge_base/logs":
-    log_dir = "/home/root01/AI_knowledge_base/logs"
-
-# 确保日志目录存在
-os.makedirs(log_dir, exist_ok=True)
-
-# 配置日志系统
-log_file = os.path.join(log_dir, "file_scan.log")
-
-# 创建logger对象
-logger = logging.getLogger("file_scanner")
-logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
-
-# 检查logger是否已有处理器，避免重复添加
-if not logger.handlers:
-    # 创建文件处理器，设置追加模式
-    file_handler = RotatingFileHandler(
-        log_file,
-        mode='a',
-        maxBytes=10*1024*1024,  # 10MB
-        backupCount=5,
-        encoding='utf-8'
-    )
+    # 从配置获取日志目录，如果没有则使用默认值
+    if 'log_config' not in config or 'log_dir' not in config['log_config']:
+        log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+    else:
+        log_dir = config['log_config']['log_dir']
+        
+    try:
+        os.makedirs(log_dir, exist_ok=True)
+    except Exception as e:
+        print(f"无法创建日志目录: {e}")
+        # 使用当前目录作为备选
+        log_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # 设置日志格式：时间 + 日志级别 + 消息
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
+    log_file = os.path.join(log_dir, "file_scan.log")
     
-    # 添加处理器到logger
-    logger.addHandler(file_handler)
+    # 创建logger对象
+    logger = logging.getLogger("file_scanner")
+    
+    # 从配置获取日志级别，如果没有则使用默认值
+    if 'log_config' not in config or 'log_level' not in config['log_config']:
+        logger.setLevel(logging.INFO)
+    else:
+        log_level = getattr(logging, config['log_config']['log_level'].upper(), logging.INFO)
+        logger.setLevel(log_level)
+    
+    # 检查logger是否已有处理器，避免重复添加
+    if not logger.handlers:
+        # 创建文件处理器，设置追加模式
+        file_handler = RotatingFileHandler(
+            log_file,
+            mode='a',
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=5,
+            encoding='utf-8'
+        )
+        
+        # 设置日志格式：时间 + 日志级别 + 消息
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        
+        # 添加处理器到logger
+        logger.addHandler(file_handler)
+    
+    return logger
+
+# 初始化配置和日志
+config = global_config.get_config()
+scan_config = config["scan_config"]
+scan_paths = scan_config["scan_paths"]
+scan_interval = scan_config["scan_interval"]
+file_types = scan_config["file_types"]
+full_scan_cycle = scan_config["full_scan_cycle"]
+blacklist = scan_config.get("blacklist", [])
+logger = setup_logging()
 
 
 def is_root():

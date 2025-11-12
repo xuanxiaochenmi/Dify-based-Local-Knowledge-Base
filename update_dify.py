@@ -8,8 +8,12 @@ from logging.handlers import RotatingFileHandler
 # 导入新的配置管理模块
 from config_manager import global_config
 
+# 初始化日志系统
+logger = None
+
 # 设置日志系统
 def setup_logging(config=None):
+    global logger
     # 从配置获取日志目录，如果没有则使用默认值
     if config is None or 'log_config' not in config or 'log_dir' not in config['log_config']:
         log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
@@ -49,23 +53,13 @@ def setup_logging(config=None):
         # 设置日志格式
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
-        
-        # 添加处理器到记录器
         logger.addHandler(file_handler)
-        
-        # 同时输出到控制台
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
     
     return logger
 
-# 获取配置
-def get_config():
-    return global_config.get_config()
-
-# 初始化日志系统
-logger = setup_logging()
+# 初始化配置和日志
+config = global_config.get_config()
+logger = setup_logging(config)
 
 # 同时修改upload_file函数中的错误处理部分
 def upload_file(dataset_id, file_path):

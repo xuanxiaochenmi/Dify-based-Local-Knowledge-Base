@@ -337,8 +337,14 @@ def main():
         # 应用命令行参数到配置
         apply_args_to_config(config, args)
         
-        # 设置日志
+        # 设置所有模块的日志
         logger = setup_logging(config)
+        
+        # 确保其他模块的日志也被正确初始化
+        import update_knowledge as uk
+        import update_dify as ud
+        uk.setup_logging(config)
+        ud.setup_logging(config)
         
         # 连接数据库
         connection = connect_to_database(config)
